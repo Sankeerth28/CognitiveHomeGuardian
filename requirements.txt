@@ -1,0 +1,10 @@
+streamlit
+torch
+torchvision
+torchaudio
+transformers
+librosa
+opencv-python-headless
+numpy
+soundfile
+plotly

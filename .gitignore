@@ -1,0 +1,17 @@
+Python
+
+*.pyc
+pycache/
+.venv/
+venv/
+ENV/
+
+Local Models (we will host them on Hugging Face)
+
+models/
+fer_model_final/
+ser_model_final/
+
+OS
+
+.DS_Store
