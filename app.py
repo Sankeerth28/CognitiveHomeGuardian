@@ -17,12 +17,12 @@ from pathlib import Path
 # 1. CONFIG & SETUP
 # ==========================================
 class Config:
-    BASE_DIR = Path(__file__).resolve().parent
-
-    # Corrected paths to point to the 'models' subdirectory
-    LOCAL_FER_PATH = BASE_DIR / "models" / "fer_model_final"
-    LOCAL_SER_PATH = BASE_DIR / "models" / "ser_model_final"
-
+    # --- THIS IS THE MAIN CHANGE ---
+    # 1. This MUST match your Hugging Face repo: "Sankeerth28/CognitiveHomeGuardian"
+    # 2. You must have manually uploaded your 'fer_model_final' and 'ser_model_final'
+    #    folders to that repo.
+    REPO_ID = "Sankeerth28/CognitiveHomeGuardian" # <--- YOUR REPO
+    
     # Original model IDs for loading pre-processors
     FER_MODEL_ID = "google/vit-base-patch16-224-in21k"
     SER_MODEL_ID = "facebook/wav2vec2-base"
@@ -37,41 +37,37 @@ class Config:
 
 
 # ==========================================
-# 2. MODEL LOADER
+# 2. MODEL LOADER (MODIFIED FOR DEPLOYMENT)
 # ==========================================
 @st.cache_resource
 def load_models():
     """Loads models and processors. Processors are loaded from the web,
-    while fine-tuned models are loaded from local disk."""
-    st.info("Loading models — this may take a few seconds...")
-
-    # Check for local model folders
-    if not Config.LOCAL_FER_PATH.exists():
-        st.error(f"❌ FER model directory not found at: {Config.LOCAL_FER_PATH}")
-        st.stop()
-
-    if not Config.LOCAL_SER_PATH.exists():
-        st.error(f"❌ SER model directory not found at: {Config.LOCAL_SER_PATH}")
+    while fine-tuned models are loaded from your Hugging Face Hub repo."""
+    st.info("Loading models from Hugging Face Hub...")
+    
+    repo = Config.REPO_ID
+    if repo == "YOUR_USERNAME/YOUR_REPO_NAME": # Failsafe
+        st.error("Please update the REPO_ID in app.py (line 22) to your Hugging Face repository.")
         st.stop()
 
     # --- Load FER Model & Processor ---
     try:
         # Load processor from web
         fer_extractor = ViTImageProcessor.from_pretrained(Config.FER_MODEL_ID)
-        # Load fine-tuned model from local disk
-        fer_model = AutoModelForImageClassification.from_pretrained(Config.LOCAL_FER_PATH)
+        # Load fine-tuned model from your HF repo, in the 'fer_model_final' subfolder
+        fer_model = AutoModelForImageClassification.from_pretrained(repo, subfolder="fer_model_final")
     except Exception as e:
-        st.error(f"Failed to load FER model: {e}")
+        st.error(f"Failed to load FER model from {repo}: {e}")
         st.stop()
 
     # --- Load SER Model & Processor ---
     try:
         # Load processor from web
         ser_extractor = AutoFeatureExtractor.from_pretrained(Config.SER_MODEL_ID)
-        # Load fine-tuned model from local disk
-        ser_model = AutoModelForAudioClassification.from_pretrained(Config.LOCAL_SER_PATH)
+        # Load fine-tuned model from your HF repo, in the 'ser_model_final' subfolder
+        ser_model = AutoModelForAudioClassification.from_pretrained(repo, subfolder="ser_model_final")
     except Exception as e:
-        st.error(f"Failed to load SER model: {e}")
+        st.error(f"Failed to load SER model from {repo}: {e}")
         st.stop()
 
     st.success("✅ Models loaded successfully.")
@@ -83,7 +79,9 @@ def load_models():
 # ==========================================
 def predict_emotion(image=None, audio_file=None, models=None):
     fer_model, fer_ext, ser_model, ser_ext = models
-    device = next(fer_model.parameters()).device # Get model's device (cpu or cuda)
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    fer_model.to(device)
+    ser_model.to(device)
 
     prob_f = np.zeros(len(Config.LABELS))
     w_f = 0.1 # Default low weight
@@ -239,7 +237,7 @@ def main():
             padding: 15px; 
             border-radius: 10px; 
             border-left: 5px solid #f44336; 
-            margin-bottom: 10px;
+            margin-bottom: 10.
         }
         .stMetric {
             border-radius: 10px;
@@ -260,7 +258,7 @@ def main():
     """, unsafe_allow_html=True)
 
     st.title("🛡️ Cognitive Home Guardian (with IoT Simulator)")
-    st.caption("Real-Time Emotion Aware IoT System | Running Locally")
+    st.caption("Real-Time Emotion Aware IoT System") # Removed "Running Locally"
 
     # --- Initialize Session State for IoT Devices ---
     if 'iot_devices' not in st.session_state:
