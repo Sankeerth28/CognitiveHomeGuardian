@@ -21,7 +21,7 @@ class Config:
     # 1. This MUST match your Hugging Face repo: "Sankeerth28/CognitiveHomeGuardian"
     # 2. You must have manually uploaded your 'fer_model_final' and 'ser_model_final'
     #    folders to that repo.
-    REPO_ID = "Sankeerth28/CognitiveHomeGuardian" # <--- YOUR REPO
+    REPO_ID = "Sankeerth004/CognitiveHomeGuardian" # <--- YOUR REPO
     
     # Original model IDs for loading pre-processors
     FER_MODEL_ID = "google/vit-base-patch16-224-in21k"
