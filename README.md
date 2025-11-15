@@ -1,11 +1,10 @@
-🛡️ Cognitive Home Guardian
+🛡️ Cognitive Home Guardian 
 ===========================
 
 This project is a software implementation of the "Cognitive Home Guardian" (CHG), a privacy-preserving, emotion-aware smart home system. It uses multimodal (face + voice) deep learning models to understand a user's emotional state and simulate an adaptive IoT response, all while running on-device to protect user privacy.
 
 This repository contains the Streamlit web application that serves as the front-end and inference engine for the project.
-
-_(Note: You will need to update this URL once your app is deployed)_
+https://cognitivehomeguardian.streamlit.app/
 
  Key Features
 ---------------
